@@ -1,10 +1,10 @@
-// API Used: https://newsapi.org/s/us-news-api
+// API details: https://newsdata.io/news-sources/India-news-api
 const container = document.querySelector(".container");
 const optionsContainer = document.querySelector(".options-container");
 
-const country = "us";    // us stands for united states
+const country = "in"; 
 const options = [
-    "general",
+    "top", 
     "entertainment",
     "health",
     "science",
@@ -15,11 +15,18 @@ const options = [
 let requestURL;
 
 const generateUI = (articles) => {
+    container.innerHTML = ""; 
+
+    if (!articles || articles.length === 0) {
+        container.innerHTML = "<p>No articles found.</p>";
+        return;
+    }
+
     for (let item of articles) {
         let card = document.createElement("div");
         card.classList.add("news-card");
         card.innerHTML = `<div class="news-image-container">
-    <img src="${item.urlToImage || "./newspaper.jpg"}" alt="" />
+    <img src="${item.image_url || "./newspaper.jpg"}" alt="" />
     </div>
     <div class="news-content">
       <div class="news-title">
@@ -28,7 +35,7 @@ const generateUI = (articles) => {
       <div class="news-description">
       ${item.description || item.content || ""}
       </div>
-      <a href="${item.url}" target="_blank" class="view-button">Read More</a>
+      <a href="${item.link}" target="_blank" class="view-button">Read More</a>
     </div>`;
         container.appendChild(card);
     }
@@ -42,7 +49,7 @@ const getNews = async () => {
         return false;
     }
     let data = await response.json();
-    generateUI(data.articles);
+    generateUI(data.results); 
 };
 
 const selectCategory = (e, category) => {
@@ -50,15 +57,16 @@ const selectCategory = (e, category) => {
     options.forEach((element) => {
         element.classList.remove("active");
     });
-    requestURL = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&apiKey=${apiKey}`;
+    
+    requestURL = `https://newsdata.io/api/1/latest?country=${country}&category=${category}&apikey=${apiKey}`;
     e.target.classList.add("active");
     getNews();
 };
 
 const createOptions = () => {
     for (let i of options) {
-        optionsContainer.innerHTML += `<button class="option ${i == "general" ? "active" : ""
-            }" onclick="selectCategory(event,'${i}')">${i}</button>`;
+        optionsContainer.innerHTML += `<button class="option ${i == "top" ? "active" : ""
+            }" onclick="selectCategory(event,'${i}')">${i}</button>`; 
     }
 };
 
@@ -69,6 +77,6 @@ const init = () => {
 };
 
 window.onload = () => {
-    requestURL = `https://newsapi.org/v2/top-headlines?country=${country}&category=general&apiKey=${apiKey}`;
+    requestURL = `https://newsdata.io/api/1/latest?country=${country}&category=top&apikey=${apiKey}`; 
     init();
 };
